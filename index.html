@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduRead Cloud - Lecture Hub & Public Preview</title>
+    <title>EduRead Cloud - Lecture Hub & File Upload Preview</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QRCode.js CDN for dynamic QR generation -->
@@ -70,9 +70,9 @@
             <div class="bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-900 border border-slate-700/80 rounded-3xl p-8 md:p-10 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
                 <div class="space-y-4 max-w-xl">
                     <span class="bg-cyan-500/20 text-cyan-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-cyan-500/30">Public Preview Mode Active</span>
-                    <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Explore Free Lecture Notes & Presentation Slides</h2>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Upload, Preview & Share Lecture Files Instantly</h2>
                     <p class="text-slate-300 text-sm md:text-base leading-relaxed">
-                        Anyone can browse and test sample files below without logging in. Sign up or log in anytime to publish your own folders and reading materials!
+                        Anyone can browse and test sample files below without logging in. Sign up or log in anytime to upload presentation files (.pptx, .pdf) and publish reading materials!
                     </p>
                     <div class="flex items-center space-x-4 pt-2">
                         <button onclick="scrollToAuth()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3 rounded-2xl transition shadow-lg shadow-cyan-600/30 text-sm">
@@ -96,7 +96,7 @@
             <div class="space-y-4">
                 <div class="flex justify-between items-center">
                     <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-folder-open text-cyan-400 mr-2"></i> Public Reading Library (Try Preview)</h3>
-                    <button onclick="scrollToAuth()" class="text-xs text-cyan-400 hover:underline"><i class="fa-solid fa-user-plus mr-1"></i> Register to Post</button>
+                    <button onclick="scrollToAuth()" class="text-xs text-cyan-400 hover:underline"><i class="fa-solid fa-user-plus mr-1"></i> Register to Upload & Post</button>
                 </div>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="public-readings-container"></div>
             </div>
@@ -105,7 +105,7 @@
             <section id="auth-section" class="max-w-md mx-auto bg-slate-800/90 backdrop-blur-xl border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden animate-scale-up mt-12">
                 <div class="bg-gradient-to-r from-cyan-600 to-indigo-600 px-6 py-6 text-center">
                     <h2 id="auth-header-title" class="text-2xl font-extrabold text-white">Member Access</h2>
-                    <p id="auth-header-subtitle" class="text-cyan-100 text-sm mt-1">Log in or sign up to publish materials</p>
+                    <p id="auth-header-subtitle" class="text-cyan-100 text-sm mt-1">Log in or sign up to upload and publish materials</p>
                 </div>
                 <div class="p-8 space-y-6">
                     <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
@@ -151,7 +151,7 @@
                 <div>
                     <span class="bg-cyan-500/20 text-cyan-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-cyan-500/30">Member Portal</span>
                     <h2 class="text-2xl font-bold mt-2 text-white">Cloud Lecture Library</h2>
-                    <p class="text-slate-300 text-sm">Create folders, preview presentations, and publish your own materials.</p>
+                    <p class="text-slate-300 text-sm">Create folders, upload presentation files, and publish your materials.</p>
                 </div>
                 <div class="flex items-center space-x-3">
                     <button onclick="openFolderModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2 shadow">
@@ -160,7 +160,7 @@
                     </button>
                     <button onclick="openCreateModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2 shadow">
                         <i class="fa-solid fa-plus"></i>
-                        <span>Publish Material</span>
+                        <span>Upload & Publish</span>
                     </button>
                 </div>
             </div>
@@ -203,8 +203,8 @@
                     <span class="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full font-semibold">Active (Online)</span>
                 </div>
                 <div class="flex justify-between items-center">
-                    <span>Public Preview</span>
-                    <span class="text-xs bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full font-semibold">Enabled for Visitors</span>
+                    <span>File Upload Support</span>
+                    <span class="text-xs bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full font-semibold">PPTX, PDF, DOCX</span>
                 </div>
                 <div class="pt-2 border-t border-slate-700 flex justify-end">
                     <button onclick="closeSettingsModal()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-xl text-xs font-semibold">Close</button>
@@ -276,11 +276,11 @@
         </div>
     </div>
 
-    <!-- ==================== MODAL: PUBLISH MATERIAL ==================== -->
+    <!-- ==================== MODAL: PUBLISH MATERIAL WITH FILE UPLOAD ==================== -->
     <div id="create-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
         <div class="bg-slate-800 border border-slate-700 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-scale-up">
             <div class="bg-slate-700/50 px-6 py-4 flex justify-between items-center border-b border-slate-700">
-                <h3 class="font-bold text-lg text-white">Publish Reading Material</h3>
+                <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-cloud-arrow-up text-emerald-400 mr-2"></i> Upload & Publish Material</h3>
                 <button onclick="closeCreateModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <form id="create-reading-form" onsubmit="handleCreateReading(event)" class="p-6 space-y-4">
@@ -303,11 +303,11 @@
                     <textarea id="new-content" rows="3" required placeholder="Key points to view in-browser..." 
                         class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500"></textarea>
                 </div>
-                <div class="grid grid-cols-2 gap-3">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">File Name</label>
-                        <input type="text" id="new-filename" required placeholder="Lecture4.pptx" 
-                            class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Upload File (.pptx, .pdf, .docx)</label>
+                        <input type="file" id="new-file-input" required accept=".pptx,.ppt,.pdf,.docx,.doc" 
+                            class="w-full text-xs text-slate-400 file:mr-2 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600 bg-slate-900 border border-slate-700 rounded-xl p-1">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Access Tier</label>
@@ -486,7 +486,6 @@
             }
         }
 
-        // Render Public Readings on Landing Page
         function renderPublicReadings() {
             const container = document.getElementById('public-readings-container');
             if (!container) return;
@@ -607,13 +606,16 @@
 
         function handleCreateReading(e) {
             e.preventDefault();
+            const fileInput = document.getElementById('new-file-input');
+            const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : "Presentation_File.pptx";
+
             const newRead = {
                 id: Date.now(),
                 folder: document.getElementById('new-material-folder').value,
                 subject: document.getElementById('new-subject').value,
                 title: document.getElementById('new-title').value,
                 content: document.getElementById('new-content').value,
-                fileName: document.getElementById('new-filename').value,
+                fileName: fileName,
                 tier: document.getElementById('new-tier').value,
                 date: new Date().toISOString().split('T')[0],
                 author: currentUser ? currentUser.name : "Community Member"
@@ -630,7 +632,6 @@
             const item = readings.find(r => r.id === id);
             if (!item) return;
 
-            // Check if file is Pro and user is not a Pro member
             if (item.tier === 'pro' && !isProMember) {
                 alert("This presentation slide requires a Pro Pass (₱199.00) to preview. Please upgrade your plan!");
                 openPaymentModal();
