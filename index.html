@@ -3,115 +3,162 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduRead - Cloud Lecture Hub with Folders</title>
+    <title>EduRead Cloud - Lecture Hub & Public Preview</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QRCode.js CDN for dynamic QR generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleUp {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-fade-in { animation: fadeIn 0.35s ease-out forwards; }
+        .animate-scale-up { animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    </style>
 </head>
-<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
+<body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col selection:bg-cyan-500 selection:text-white">
 
     <!-- Top Navigation Bar -->
-    <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center shadow-md">
+    <header class="bg-slate-800/90 backdrop-blur-md border-b border-slate-700/80 px-6 py-4 flex justify-between items-center shadow-lg sticky top-0 z-40 transition-all">
         <div class="flex items-center space-x-3">
-            <div class="bg-cyan-600 text-white p-2.5 rounded-xl shadow-lg">
-                <i class="fa-solid fa-folder-tree text-xl"></i>
+            <div class="bg-gradient-to-tr from-cyan-600 to-indigo-600 text-white p-2.5 rounded-xl shadow-md">
+                <i class="fa-solid fa-graduation-cap text-xl"></i>
             </div>
             <div>
-                <h1 class="text-xl font-bold tracking-wide">EduRead Cloud Portal</h1>
-                <p class="text-xs text-slate-400">Secure Lecture Hub with Custom Folders</p>
+                <h1 class="text-xl font-bold tracking-wide bg-gradient-to-r from-cyan-400 to-indigo-400 bg-clip-text text-transparent">EduRead Hub</h1>
+                <p class="text-xs text-slate-400">Cloud Lecture & Public Preview Portal</p>
             </div>
         </div>
-        <div id="user-status" class="hidden flex items-center space-x-4">
-            <div class="text-right">
-                <p id="nav-username" class="text-sm font-semibold text-slate-200">User Name</p>
-                <p id="nav-role" class="text-xs uppercase tracking-wider text-cyan-400 font-bold">Role</p>
+
+        <div class="flex items-center space-x-3">
+            <div class="hidden md:flex items-center space-x-2 mr-2">
+                <button onclick="openPaymentModal()" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-300 hover:bg-amber-500/10 transition border border-amber-500/20">
+                    <i class="fa-solid fa-peso-sign mr-1"></i> Pro Pass (₱199)
+                </button>
             </div>
-            <button onclick="logout()" class="bg-rose-600 hover:bg-rose-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition flex items-center space-x-2">
-                <i class="fa-solid fa-right-from-bracket"></i>
-                <span>Logout</span>
+
+            <button onclick="openSettingsModal()" class="bg-slate-700/60 hover:bg-slate-700 text-slate-200 p-2.5 rounded-xl text-sm transition shadow-sm" title="Settings">
+                <i class="fa-solid fa-gear"></i>
             </button>
+
+            <div id="user-status" class="hidden flex items-center space-x-3 animate-fade-in pl-2 border-l border-slate-700">
+                <div class="text-right hidden sm:block">
+                    <p id="nav-username" class="text-xs font-semibold text-slate-200">User Name</p>
+                    <p class="text-[10px] uppercase tracking-wider text-cyan-400 font-bold" id="nav-membership-tier">Free Member</p>
+                </div>
+                <button onclick="logout()" class="bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white px-3 py-1.5 rounded-xl text-xs font-medium transition-all duration-200 flex items-center space-x-1.5 border border-rose-500/30">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span class="hidden sm:inline">Logout</span>
+                </button>
+            </div>
         </div>
     </header>
 
     <!-- Main Container -->
     <main class="flex-grow container mx-auto px-4 py-8 max-w-6xl">
 
-        <!-- ==================== VIEW 1: LOGIN GATE ==================== -->
-        <section id="login-view" class="max-w-md mx-auto bg-slate-800 border border-slate-700 rounded-2xl shadow-xl overflow-hidden mt-10">
-            <div class="bg-cyan-600 px-6 py-6 text-center">
-                <h2 class="text-2xl font-extrabold text-white">Portal Access Gate</h2>
-                <p class="text-cyan-100 text-sm mt-1">Scan lecture QR or log in to access folders</p>
-            </div>
-            <div class="p-8 space-y-6">
-                <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email or ID</label>
-                        <input type="text" id="login-id" required placeholder="e.g. student@school.edu" 
-                            class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
-                        <input type="password" id="login-password" required placeholder="••••••••" 
-                            class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-                    </div>
-                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 rounded-xl transition shadow-lg">
-                        Secure Login
-                    </button>
-                </form>
-
-                <div class="border-t border-slate-700 pt-4">
-                    <p class="text-xs text-slate-400 text-center mb-2">Quick Demo Accounts:</p>
-                    <div class="grid grid-cols-2 gap-2">
-                        <button type="button" onclick="fillDemo('student')" class="bg-slate-700 hover:bg-slate-600 text-xs py-2 px-3 rounded-lg text-cyan-300 font-medium">Student Demo</button>
-                        <button type="button" onclick="fillDemo('prof')" class="bg-slate-700 hover:bg-slate-600 text-xs py-2 px-3 rounded-lg text-emerald-300 font-medium">Professor Demo</button>
+        <!-- ==================== VIEW 1: PUBLIC PREVIEW & LANDING ==================== -->
+        <div id="landing-view" class="space-y-10 animate-fade-in">
+            <!-- Hero Banner -->
+            <div class="bg-gradient-to-r from-slate-800 via-slate-800/90 to-slate-900 border border-slate-700/80 rounded-3xl p-8 md:p-10 shadow-2xl flex flex-col md:flex-row items-center justify-between gap-8">
+                <div class="space-y-4 max-w-xl">
+                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-cyan-500/30">Public Preview Mode Active</span>
+                    <h2 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Explore Free Lecture Notes & Presentation Slides</h2>
+                    <p class="text-slate-300 text-sm md:text-base leading-relaxed">
+                        Anyone can browse and test sample files below without logging in. Sign up or log in anytime to publish your own folders and reading materials!
+                    </p>
+                    <div class="flex items-center space-x-4 pt-2">
+                        <button onclick="scrollToAuth()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-semibold px-6 py-3 rounded-2xl transition shadow-lg shadow-cyan-600/30 text-sm">
+                            Join / Sign In
+                        </button>
+                        <button onclick="openPaymentModal()" class="bg-slate-700/60 hover:bg-slate-700 text-amber-300 font-semibold px-5 py-3 rounded-2xl transition border border-amber-500/20 text-sm">
+                            Get Pro Pass (₱199)
+                        </button>
                     </div>
                 </div>
-            </div>
-        </section>
 
-        <!-- ==================== VIEW 2: STUDENT HUB ==================== -->
-        <section id="student-dashboard" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-cyan-950/80 to-slate-800 border border-cyan-700/50 p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-cyan-500/30">Student Folder Library</span>
-                    <h2 class="text-2xl font-bold mt-2 text-white">Organized Lecture Folders</h2>
-                    <p class="text-slate-300 text-sm">Select a folder below to browse reading materials and presentation slides.</p>
+                <!-- QR Share Box -->
+                <div class="bg-slate-900/90 border border-slate-700 p-6 rounded-2xl shadow-xl w-full md:w-72 flex flex-col items-center text-center">
+                    <h3 class="text-xs uppercase font-bold text-slate-400 mb-3">Scan to Share Portal</h3>
+                    <div id="landing-qrcode-container" class="bg-white p-3 rounded-xl shadow-inner mb-3"></div>
+                    <p class="text-[11px] text-cyan-300 font-mono">Instant QR Access</p>
                 </div>
-                <button onclick="openFolderModal()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2">
-                    <i class="fa-solid fa-folder-plus"></i>
-                    <span>+ Create New Folder</span>
-                </button>
             </div>
 
-            <!-- Folders Bar -->
-            <div class="flex items-center space-x-3 overflow-x-auto pb-2" id="student-folders-bar">
-                <!-- Dynamically populated via JS -->
+            <!-- Public Reading Materials Section -->
+            <div class="space-y-4">
+                <div class="flex justify-between items-center">
+                    <h3 class="text-xl font-bold text-white"><i class="fa-solid fa-folder-open text-cyan-400 mr-2"></i> Public Reading Library (Try Preview)</h3>
+                    <button onclick="scrollToAuth()" class="text-xs text-cyan-400 hover:underline"><i class="fa-solid fa-user-plus mr-1"></i> Register to Post</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="public-readings-container"></div>
             </div>
 
-            <!-- Active Folder Materials Grid -->
-            <div>
-                <h3 id="student-current-folder-title" class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-folder-open text-cyan-400 mr-2"></i> All Materials</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="student-readings-container"></div>
-            </div>
-        </section>
+            <!-- Login / Sign-Up Section -->
+            <section id="auth-section" class="max-w-md mx-auto bg-slate-800/90 backdrop-blur-xl border border-slate-700/80 rounded-3xl shadow-2xl overflow-hidden animate-scale-up mt-12">
+                <div class="bg-gradient-to-r from-cyan-600 to-indigo-600 px-6 py-6 text-center">
+                    <h2 id="auth-header-title" class="text-2xl font-extrabold text-white">Member Access</h2>
+                    <p id="auth-header-subtitle" class="text-cyan-100 text-sm mt-1">Log in or sign up to publish materials</p>
+                </div>
+                <div class="p-8 space-y-6">
+                    <form id="auth-form" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+                        <div id="name-field-container" class="hidden">
+                            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Full Name</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-user-pen"></i></span>
+                                <input type="text" id="auth-name" placeholder="e.g. Limwel Barola" 
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email Address</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-envelope"></i></span>
+                                <input type="email" id="auth-email" required placeholder="user@school.edu" 
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm transition">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" id="auth-password" required placeholder="••••••••" 
+                                    class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500 text-sm transition">
+                            </div>
+                        </div>
+                        <button type="submit" id="auth-submit-btn" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-cyan-600/30 text-sm">
+                            Sign In
+                        </button>
+                    </form>
 
-        <!-- ==================== VIEW 3: PROFESSOR HUB ==================== -->
-        <section id="professor-dashboard" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-emerald-950/80 to-slate-800 border border-emerald-700/50 p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div class="text-center text-xs text-slate-400 pt-2 border-t border-slate-700/60">
+                        <p id="auth-toggle-text">Don't have an account? <button type="button" onclick="toggleAuthMode()" class="text-cyan-400 hover:underline font-semibold ml-1">Sign Up</button></p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==================== VIEW 2: MEMBER DASHBOARD ==================== -->
+        <section id="dashboard-view" class="hidden space-y-6 animate-fade-in">
+            <div class="bg-gradient-to-r from-slate-800 to-slate-800/90 border border-slate-700 p-6 rounded-3xl shadow-xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <span class="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-emerald-500/30">Faculty Folder & Post Manager</span>
-                    <h2 class="text-2xl font-bold mt-2 text-white">Professor Material Manager</h2>
-                    <p class="text-slate-300 text-sm">Create folders, publish presentations, and manage your course library.</p>
+                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-cyan-500/30">Member Portal</span>
+                    <h2 class="text-2xl font-bold mt-2 text-white">Cloud Lecture Library</h2>
+                    <p class="text-slate-300 text-sm">Create folders, preview presentations, and publish your own materials.</p>
                 </div>
                 <div class="flex items-center space-x-3">
-                    <button onclick="openFolderModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2">
+                    <button onclick="openFolderModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2 shadow">
                         <i class="fa-solid fa-folder-plus"></i>
-                        <span>New Folder</span>
+                        <span>+ New Folder</span>
                     </button>
-                    <button onclick="openCreateModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2">
+                    <button onclick="openCreateModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2 shadow">
                         <i class="fa-solid fa-plus"></i>
                         <span>Publish Material</span>
                     </button>
@@ -119,20 +166,18 @@
             </div>
 
             <!-- Folders Bar -->
-            <div class="flex items-center space-x-3 overflow-x-auto pb-2" id="prof-folders-bar">
-                <!-- Dynamically populated via JS -->
-            </div>
+            <div class="flex items-center space-x-3 overflow-x-auto pb-2" id="folders-bar"></div>
 
+            <!-- Materials Grid -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div class="lg:col-span-2 space-y-4">
-                    <h3 id="prof-current-folder-title" class="text-lg font-semibold text-slate-200"><i class="fa-solid fa-folder-open text-emerald-400 mr-2"></i> All Materials</h3>
-                    <div id="prof-readings-list" class="space-y-4"></div>
+                    <h3 id="current-folder-title" class="text-lg font-semibold text-slate-200"><i class="fa-solid fa-folder-open text-cyan-400 mr-2"></i> All Materials</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="readings-container"></div>
                 </div>
 
-                <!-- QR Generator Box -->
                 <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-lg flex flex-col items-center text-center">
                     <h3 class="text-lg font-semibold text-slate-200 mb-1">Live Global QR Code</h3>
-                    <p class="text-xs text-slate-400 mb-4">Scan to access this folder portal from anywhere.</p>
+                    <p class="text-xs text-slate-400 mb-4">Scan to access this portal from anywhere.</p>
                     <div id="qrcode-container" class="bg-white p-4 rounded-xl shadow-inner mb-4"></div>
                     <p id="qr-url-display" class="text-xs text-cyan-300 break-all font-mono mb-4 px-2"></p>
                 </div>
@@ -141,12 +186,87 @@
 
     </main>
 
-    <!-- Modal: Create Folder -->
-    <div id="folder-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-sm p-6 space-y-4">
+    <!-- ==================== MODAL: SETTINGS ==================== -->
+    <div id="settings-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-slate-800 border border-slate-700 rounded-3xl w-full max-w-md p-6 space-y-5 animate-scale-up shadow-2xl">
+            <div class="flex justify-between items-center border-b border-slate-700 pb-3">
+                <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-gear text-cyan-400 mr-2"></i> Website Settings</h3>
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="space-y-4 text-sm text-slate-300">
+                <div class="flex justify-between items-center">
+                    <span>Dark Mode Theme</span>
+                    <span class="text-xs bg-cyan-500/20 text-cyan-300 px-2.5 py-1 rounded-full font-semibold">Enabled</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Cloud Sync Status</span>
+                    <span class="text-xs bg-emerald-500/20 text-emerald-300 px-2.5 py-1 rounded-full font-semibold">Active (Online)</span>
+                </div>
+                <div class="flex justify-between items-center">
+                    <span>Public Preview</span>
+                    <span class="text-xs bg-indigo-500/20 text-indigo-300 px-2.5 py-1 rounded-full font-semibold">Enabled for Visitors</span>
+                </div>
+                <div class="pt-2 border-t border-slate-700 flex justify-end">
+                    <button onclick="closeSettingsModal()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-xl text-xs font-semibold">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: PRICING & PHP PAYMENT PLAN ==================== -->
+    <div id="payment-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-slate-800 border border-slate-700 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-scale-up flex flex-col max-h-[90vh]">
+            <div class="bg-gradient-to-r from-amber-600 to-orange-600 px-6 py-5 flex justify-between items-center text-white">
+                <div>
+                    <span class="text-[10px] uppercase font-bold tracking-wider bg-black/20 px-2.5 py-0.5 rounded-full">Philippine Peso (PHP)</span>
+                    <h3 class="font-bold text-xl mt-1">Unlock Pro Access Pass</h3>
+                </div>
+                <button onclick="closePaymentModal()" class="text-white hover:text-amber-200 text-lg"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="p-6 space-y-6 overflow-y-auto">
+                <div class="bg-slate-900/60 border border-slate-700 p-5 rounded-2xl text-center space-y-2">
+                    <p class="text-xs uppercase text-slate-400 font-semibold">Pro Monthly Pass</p>
+                    <div class="text-3xl font-black text-amber-400">₱199.00 <span class="text-xs font-normal text-slate-400">/ month</span></div>
+                    <p class="text-xs text-slate-300">Unlock instant in-browser previews for all Pro-tier presentation files and lecture decks.</p>
+                </div>
+
+                <form onsubmit="handlePaymentSubmit(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Cardholder Name</label>
+                        <input type="text" required placeholder="Limwel Barola" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-amber-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Credit Card Number</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400"><i class="fa-regular fa-credit-card"></i></span>
+                            <input type="text" required placeholder="4000 1234 5678 9010" maxlength="19" class="w-full pl-10 pr-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-amber-500 font-mono">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Expiry Date</label>
+                            <input type="text" required placeholder="MM/YY" maxlength="5" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-amber-500 font-mono">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">CVV</label>
+                            <input type="password" required placeholder="123" maxlength="4" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-amber-500 font-mono">
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-orange-600/30 text-sm flex items-center justify-center space-x-2">
+                        <i class="fa-solid fa-lock"></i>
+                        <span>Pay ₱199.00 Securely via Credit Card</span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== MODAL: CREATE FOLDER ==================== -->
+    <div id="folder-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-slate-800 border border-slate-700 rounded-3xl w-full max-w-sm p-6 space-y-4 animate-scale-up shadow-2xl">
             <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-folder-plus text-cyan-400 mr-2"></i> Create Folder</h3>
             <form onsubmit="handleCreateFolder(event)" class="space-y-3">
-                <input type="text" id="new-folder-name" required placeholder="Folder Name (e.g. Prelim Review)" 
+                <input type="text" id="new-folder-name" required placeholder="Folder Name (e.g. Finals Review)" 
                     class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-cyan-500">
                 <div class="flex justify-end space-x-2 pt-2">
                     <button type="button" onclick="closeFolderModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl text-xs">Cancel</button>
@@ -156,9 +276,9 @@
         </div>
     </div>
 
-    <!-- Modal: Publish Reading Material -->
-    <div id="create-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
+    <!-- ==================== MODAL: PUBLISH MATERIAL ==================== -->
+    <div id="create-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-slate-800 border border-slate-700 rounded-3xl w-full max-w-lg shadow-2xl overflow-hidden animate-scale-up">
             <div class="bg-slate-700/50 px-6 py-4 flex justify-between items-center border-b border-slate-700">
                 <h3 class="font-bold text-lg text-white">Publish Reading Material</h3>
                 <button onclick="closeCreateModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
@@ -166,9 +286,7 @@
             <form id="create-reading-form" onsubmit="handleCreateReading(event)" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Select Folder</label>
-                    <select id="new-material-folder" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
-                        <!-- Populated dynamically -->
-                    </select>
+                    <select id="new-material-folder" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500"></select>
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Subject / Course</label>
@@ -181,14 +299,23 @@
                         class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Summary & Notes</label>
-                    <textarea id="new-content" rows="3" required placeholder="Key points to review..." 
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Summary & Browser Preview Notes</label>
+                    <textarea id="new-content" rows="3" required placeholder="Key points to view in-browser..." 
                         class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500"></textarea>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">File Name</label>
-                    <input type="text" id="new-filename" required placeholder="e.g. Lecture4.pptx" 
-                        class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">File Name</label>
+                        <input type="text" id="new-filename" required placeholder="Lecture4.pptx" 
+                            class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Access Tier</label>
+                        <select id="new-tier" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
+                            <option value="free">Free for Everyone</option>
+                            <option value="pro">Pro Only (₱199 Pass Required)</option>
+                        </select>
+                    </div>
                 </div>
                 <div class="flex justify-end space-x-3 pt-2">
                     <button type="button" onclick="closeCreateModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl text-xs">Cancel</button>
@@ -198,46 +325,43 @@
         </div>
     </div>
 
-    <!-- Modal: Read Material Viewer -->
-    <div id="read-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+    <!-- ==================== MODAL: IN-BROWSER FILE PREVIEW ==================== -->
+    <div id="read-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in">
+        <div class="bg-slate-800 border border-slate-700 rounded-3xl w-full max-w-3xl shadow-2xl overflow-hidden animate-scale-up flex flex-col max-h-[90vh]">
             <div class="bg-cyan-600 px-6 py-4 flex justify-between items-center text-white">
                 <div>
                     <span id="read-modal-sub" class="text-xs uppercase font-bold tracking-wider text-cyan-200">Subject</span>
-                    <h3 id="read-modal-title" class="font-bold text-lg">Reading Material Viewer</h3>
+                    <h3 id="read-modal-title" class="font-bold text-lg">In-Browser Presentation Preview</h3>
                 </div>
                 <button onclick="closeReadModal()" class="text-white hover:text-cyan-200 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 space-y-6 overflow-y-auto flex-grow">
-                <div class="bg-slate-900/60 border border-slate-700 rounded-xl p-5 space-y-3">
-                    <h5 class="text-xs uppercase font-bold text-cyan-400 tracking-wider">Lecture Summary & Notes</h5>
-                    <p id="read-modal-content" class="text-slate-200 text-sm leading-relaxed whitespace-pre-line"></p>
-                </div>
-                <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 flex items-center justify-between">
-                    <div class="flex items-center space-x-3">
-                        <div class="bg-cyan-500/20 text-cyan-400 p-3 rounded-xl border border-cyan-500/30">
-                            <i class="fa-solid fa-file-powerpoint text-2xl"></i>
-                        </div>
-                        <div>
-                            <h4 id="read-filename" class="font-bold text-white text-sm">Presentation.pptx</h4>
-                            <p class="text-xs text-slate-400">Cloud Synced File</p>
-                        </div>
+                <!-- Slide Preview Box -->
+                <div class="bg-slate-900 border border-slate-700 rounded-2xl p-8 text-center space-y-4">
+                    <div class="inline-block bg-cyan-500/20 text-cyan-400 p-4 rounded-2xl border border-cyan-500/30">
+                        <i class="fa-solid fa-display text-4xl"></i>
                     </div>
-                    <button onclick="alert('Downloading file...')" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow">
-                        <i class="fa-solid fa-download mr-1"></i> Download File
-                    </button>
+                    <h4 id="preview-filename-display" class="font-bold text-white text-base">Lecture_Slides.pptx</h4>
+                    <p class="text-xs text-slate-400">Secure In-Browser Presentation Slide Viewer (No Downloads)</p>
+                </div>
+
+                <div class="bg-slate-900/60 border border-slate-700 rounded-2xl p-5 space-y-3">
+                    <h5 class="text-xs uppercase font-bold text-cyan-400 tracking-wider">Slide Notes & Summary</h5>
+                    <p id="read-modal-content" class="text-slate-200 text-sm leading-relaxed whitespace-pre-line"></p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- JavaScript Application Logic with Cloud JSONbin Sync -->
+    <!-- ==================== JAVASCRIPT APPLICATION LOGIC ==================== -->
     <script>
         const BIN_ID = "6771804ead19ca34f8f41423"; 
         const API_KEY = "$2a$10$t6k30wY2S0t5d5zH5Pj97eqg5Zt1uXp4q3a15Z2b3c4d5e6f7g8h9";
         const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
         let currentUser = null;
+        let isSignUpMode = false;
+        let isProMember = false;
         let folders = ["All Materials", "General Lectures", "Midterm Review"];
         let readings = [
             {
@@ -245,22 +369,37 @@
                 folder: "General Lectures",
                 subject: "Information Technology",
                 title: "Chapter 1: Network Architecture",
-                content: "Overview of OSI 7-Layer Model and subnet calculations.",
+                content: "Overview of OSI 7-Layer Model and subnet calculations. (Free public preview available)",
                 fileName: "IT302_Ch1.pptx",
-                date: "2026-03-10"
+                date: "2026-03-10",
+                author: "System Admin",
+                tier: "free"
+            },
+            {
+                id: 2,
+                folder: "Midterm Review",
+                subject: "Web Systems",
+                title: "Advanced REST API Security",
+                content: "Detailed token validation and bearer header protocols. (Pro Pass ₱199 Required)",
+                fileName: "WebSys_Security.pptx",
+                date: "2026-03-12",
+                author: "Dr. Alvero",
+                tier: "pro"
             }
         ];
         let currentFolderFilter = "All Materials";
 
         window.onload = function() {
             const currentUrl = window.location.href.split('#')[0];
-            renderQRCode(currentUrl);
+            renderQRCode(currentUrl, "qrcode-container");
+            renderQRCode(currentUrl, "landing-qrcode-container");
             document.getElementById('qr-url-display').innerText = currentUrl;
             loadCloudData();
         };
 
-        function renderQRCode(text) {
-            const container = document.getElementById("qrcode-container");
+        function renderQRCode(text, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
             container.innerHTML = "";
             new QRCode(container, {
                 text: text,
@@ -272,55 +411,48 @@
             });
         }
 
-        function fillDemo(type) {
-            if (type === 'student') {
-                document.getElementById('login-id').value = "student@school.edu";
-                document.getElementById('login-password').value = "student123";
-            } else {
-                document.getElementById('login-id').value = "prof@school.edu";
-                document.getElementById('login-password').value = "prof123";
-            }
+        function scrollToAuth() {
+            document.getElementById('auth-section').scrollIntoView({ behavior: 'smooth' });
         }
 
-        function handleLogin(e) {
+        function toggleAuthMode() {
+            isSignUpMode = !isSignUpMode;
+            document.getElementById('auth-header-title').innerText = isSignUpMode ? "Create Account" : "Member Access";
+            document.getElementById('auth-header-subtitle').innerText = isSignUpMode ? "Sign up to start previewing and posting materials" : "Log in or sign up to publish materials";
+            document.getElementById('name-field-container').classList.toggle('hidden', !isSignUpMode);
+            document.getElementById('auth-submit-btn').innerText = isSignUpMode ? "Sign Up" : "Sign In";
+            document.getElementById('auth-toggle-text').innerHTML = isSignUpMode 
+                ? 'Already have an account? <button type="button" onclick="toggleAuthMode()" class="text-cyan-400 hover:underline font-semibold ml-1">Sign In</button>' 
+                : 'Don\'t have an account? <button type="button" onclick="toggleAuthMode()" class="text-cyan-400 hover:underline font-semibold ml-1">Sign Up</button>';
+        }
+
+        function handleAuthSubmit(e) {
             e.preventDefault();
-            const idInput = document.getElementById('login-id').value.trim();
-            const passInput = document.getElementById('login-password').value;
+            const email = document.getElementById('auth-email').value.trim();
+            const nameInput = document.getElementById('auth-name').value.trim();
+            let name = nameInput || email.split('@')[0];
 
-            const accounts = {
-                "student@school.edu": { name: "Limwel Barola", role: "student", pass: "student123" },
-                "prof@school.edu": { name: "Dr. Alvero", role: "professor", pass: "prof123" }
-            };
-
-            if (accounts[idInput] && accounts[idInput].pass === passInput) {
-                currentUser = { email: idInput, ...accounts[idInput] };
-                updateUIAfterLogin();
-            } else {
-                alert("Invalid login credentials! Use demo buttons.");
-            }
+            currentUser = { email: email, name: name };
+            updateUIAfterLogin();
         }
 
         function updateUIAfterLogin() {
-            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('landing-view').classList.add('hidden');
+            document.getElementById('dashboard-view').classList.remove('hidden');
             document.getElementById('user-status').classList.remove('hidden');
             document.getElementById('nav-username').innerText = currentUser.name;
-            document.getElementById('nav-role').innerText = currentUser.role;
+            document.getElementById('nav-membership-tier').innerText = isProMember ? "Pro Member" : "Free Member";
 
             loadCloudData();
-            if (currentUser.role === 'student') {
-                document.getElementById('student-dashboard').classList.remove('hidden');
-            } else {
-                document.getElementById('professor-dashboard').classList.remove('hidden');
-            }
         }
 
         function logout() {
             currentUser = null;
             document.getElementById('user-status').classList.add('hidden');
-            document.getElementById('student-dashboard').classList.add('hidden');
-            document.getElementById('professor-dashboard').classList.add('hidden');
-            document.getElementById('login-view').classList.remove('hidden');
-            document.getElementById('login-form').reset();
+            document.getElementById('dashboard-view').classList.add('hidden');
+            document.getElementById('landing-view').classList.remove('hidden');
+            document.getElementById('auth-form').reset();
+            refreshUI();
         }
 
         function loadCloudData() {
@@ -332,7 +464,10 @@
                     folders = data.record.folders || folders;
                 }
                 refreshUI();
-            }).catch(err => console.log("Cloud sync fallback:", err));
+            }).catch(err => {
+                console.log("Cloud sync fallback:", err);
+                refreshUI();
+            });
         }
 
         function saveCloudData() {
@@ -340,44 +475,76 @@
                 method: 'PUT',
                 headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
                 body: JSON.stringify({ readings: readings, folders: folders })
-            });
+            }).catch(err => console.log("Offline save fallback:", err));
         }
 
         function refreshUI() {
+            renderPublicReadings();
             renderFoldersBar();
             if (currentUser) {
-                if (currentUser.role === 'student') renderStudentReadings();
-                else renderProfessorReadings();
+                renderReadings();
             }
         }
 
-        // Folder Rendering & Navigation
-        function renderFoldersBar() {
-            const bars = ['student-folders-bar', 'prof-folders-bar'];
-            bars.forEach(barId => {
-                const bar = document.getElementById(barId);
-                if (!bar) return;
-                bar.innerHTML = "";
+        // Render Public Readings on Landing Page
+        function renderPublicReadings() {
+            const container = document.getElementById('public-readings-container');
+            if (!container) return;
+            container.innerHTML = "";
 
-                folders.forEach(folder => {
-                    const isActive = currentFolderFilter === folder;
-                    const btn = document.createElement('button');
-                    btn.className = `px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-2 whitespace-nowrap ${
-                        isActive ? 'bg-cyan-600 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
-                    }`;
-                    btn.innerHTML = `<i class="fa-solid fa-folder${isActive ? '-open' : ''}"></i><span>${folder}</span>`;
-                    btn.onclick = () => {
-                        currentFolderFilter = folder;
-                        refreshUI();
-                    };
-                    bar.appendChild(btn);
-                });
+            readings.forEach(item => {
+                const isPro = item.tier === 'pro';
+                const card = document.createElement('div');
+                card.className = "bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-lg flex flex-col justify-between hover:border-slate-600 transition";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-md font-semibold">${item.subject}</span>
+                            <span class="text-[10px] ${isPro ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300'} px-2 py-0.5 rounded font-bold">${isPro ? 'PRO (₱199)' : 'FREE PREVIEW'}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">${item.title}</h3>
+                        <p class="text-slate-300 text-sm mb-4 leading-relaxed line-clamp-2">${item.content}</p>
+                    </div>
+                    <div class="border-t border-slate-700 pt-4 flex items-center justify-between">
+                        <span class="text-xs text-slate-400"><i class="fa-solid fa-file-powerpoint text-cyan-400 mr-1"></i> ${item.fileName}</span>
+                        <button onclick="openReadModal(${item.id})" class="bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-xl text-xs transition shadow flex items-center space-x-2">
+                            <i class="fa-solid fa-eye"></i><span>Preview</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderFoldersBar() {
+            const bar = document.getElementById('folders-bar');
+            if (!bar) return;
+            bar.innerHTML = "";
+
+            folders.forEach(folder => {
+                const isActive = currentFolderFilter === folder;
+                const wrapper = document.createElement('div');
+                wrapper.className = `flex items-center rounded-2xl transition whitespace-nowrap shadow-sm ${
+                    isActive ? 'bg-cyan-600 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                }`;
+
+                const selectBtn = document.createElement('button');
+                selectBtn.className = "px-4 py-2.5 text-xs font-semibold flex items-center space-x-2";
+                selectBtn.innerHTML = `<i class="fa-solid fa-folder${isActive ? '-open' : ''}"></i><span>${folder}</span>`;
+                selectBtn.onclick = () => {
+                    currentFolderFilter = folder;
+                    refreshUI();
+                };
+                wrapper.appendChild(selectBtn);
+                bar.appendChild(wrapper);
             });
 
-            // Update modal folder select options
             const select = document.getElementById('new-material-folder');
             if (select) {
-                select.innerHTML = folders.filter(f => f !== "All Materials").map(f => `<option value="${f}">${f}</option>`).join('');
+                const assignableFolders = folders.filter(f => f !== "All Materials");
+                select.innerHTML = assignableFolders.length > 0
+                    ? assignableFolders.map(f => `<option value="${f}">${f}</option>`).join('')
+                    : `<option value="General">General</option>`;
             }
         }
 
@@ -392,17 +559,16 @@
                 saveCloudData().then(() => {
                     closeFolderModal();
                     refreshUI();
-                    alert(`Folder "${name}" created successfully!`);
                 });
             } else {
                 alert("Folder already exists or invalid name.");
             }
         }
 
-        // Student View
-        function renderStudentReadings() {
-            document.getElementById('student-current-folder-title').innerHTML = `<i class="fa-solid fa-folder-open text-cyan-400 mr-2"></i> Folder: ${currentFolderFilter}`;
-            const container = document.getElementById('student-readings-container');
+        function renderReadings() {
+            document.getElementById('current-folder-title').innerHTML = `<i class="fa-solid fa-folder-open text-cyan-400 mr-2"></i> Folder: ${currentFolderFilter}`;
+            
+            const container = document.getElementById('readings-container');
             container.innerHTML = "";
 
             const filtered = currentFolderFilter === "All Materials" ? readings : readings.filter(r => r.folder === currentFolderFilter);
@@ -413,59 +579,24 @@
             }
 
             filtered.forEach(item => {
+                const isPro = item.tier === 'pro';
                 const card = document.createElement('div');
-                card.className = "bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-lg flex flex-col justify-between";
+                card.className = "bg-slate-800 border border-slate-700 rounded-3xl p-6 shadow-lg flex flex-col justify-between hover:border-slate-600 transition";
                 card.innerHTML = `
                     <div>
                         <div class="flex justify-between items-start mb-3">
                             <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-md font-semibold">${item.subject}</span>
-                            <span class="text-xs text-slate-400"><i class="fa-solid fa-folder text-cyan-400 mr-1"></i> ${item.folder}</span>
+                            <span class="text-[10px] ${isPro ? 'bg-amber-500/20 text-amber-300 border border-amber-500/30' : 'bg-emerald-500/20 text-emerald-300'} px-2 py-0.5 rounded font-bold">${isPro ? 'PRO (₱199)' : 'FREE'}</span>
                         </div>
                         <h3 class="text-lg font-bold text-white mb-2">${item.title}</h3>
-                        <p class="text-slate-300 text-sm mb-4 leading-relaxed line-clamp-2">${item.content}</p>
+                        <p class="text-slate-300 text-sm mb-2 leading-relaxed line-clamp-2">${item.content}</p>
                     </div>
-                    <div class="border-t border-slate-700 pt-4 mt-2 flex items-center justify-between">
+                    <div class="border-t border-slate-700 pt-4 flex items-center justify-between">
                         <span class="text-xs text-slate-400"><i class="fa-solid fa-file-powerpoint text-cyan-400 mr-1"></i> ${item.fileName}</span>
                         <button onclick="openReadModal(${item.id})" class="bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-xl text-xs transition shadow flex items-center space-x-2">
-                            <i class="fa-solid fa-book-open"></i><span>Read</span>
+                            <i class="fa-solid fa-eye"></i><span>Preview</span>
                         </button>
                     </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Professor View
-        function renderProfessorReadings() {
-            document.getElementById('prof-current-folder-title').innerHTML = `<i class="fa-solid fa-folder-open text-emerald-400 mr-2"></i> Folder: ${currentFolderFilter}`;
-            const container = document.getElementById('prof-readings-list');
-            container.innerHTML = "";
-
-            const filtered = currentFolderFilter === "All Materials" ? readings : readings.filter(r => r.folder === currentFolderFilter);
-
-            if (filtered.length === 0) {
-                container.innerHTML = `<p class="text-slate-400 text-sm text-center py-8">No materials found in this folder.</p>`;
-                return;
-            }
-
-            filtered.forEach(item => {
-                const card = document.createElement('div');
-                card.className = "bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-lg space-y-3";
-                card.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-1 rounded-md font-semibold">${item.subject}</span>
-                            <h4 class="text-lg font-bold text-white mt-1">${item.title}</h4>
-                        </div>
-                        <div class="flex items-center space-x-3">
-                            <span class="text-xs bg-slate-700 px-2.5 py-1 rounded text-slate-300"><i class="fa-solid fa-folder text-emerald-400 mr-1"></i> ${item.folder}</span>
-                            <button onclick="deleteReading(${item.id})" class="bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 p-2 rounded-lg text-xs transition" title="Delete">
-                                <i class="fa-solid fa-trash"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <p class="text-slate-300 text-sm whitespace-pre-line line-clamp-2">${item.content}</p>
-                    <div class="text-xs text-slate-400 pt-2 border-t border-slate-700/60">File: ${item.fileName}</div>
                 `;
                 container.appendChild(card);
             });
@@ -483,7 +614,52 @@
                 title: document.getElementById('new-title').value,
                 content: document.getElementById('new-content').value,
                 fileName: document.getElementById('new-filename').value,
-                date: new Date().toISOString().split('T')[0]
+                tier: document.getElementById('new-tier').value,
+                date: new Date().toISOString().split('T')[0],
+                author: currentUser ? currentUser.name : "Community Member"
             };
 
-            readings.unshift(
+            readings.unshift(newRead);
+            saveCloudData().then(() => {
+                closeCreateModal();
+                refreshUI();
+            });
+        }
+
+        function openReadModal(id) {
+            const item = readings.find(r => r.id === id);
+            if (!item) return;
+
+            // Check if file is Pro and user is not a Pro member
+            if (item.tier === 'pro' && !isProMember) {
+                alert("This presentation slide requires a Pro Pass (₱199.00) to preview. Please upgrade your plan!");
+                openPaymentModal();
+                return;
+            }
+
+            document.getElementById('read-modal-sub').innerText = `${item.subject} (${item.folder})`;
+            document.getElementById('read-modal-title').innerText = item.title;
+            document.getElementById('preview-filename-display').innerText = item.fileName;
+            document.getElementById('read-modal-content').innerText = item.content;
+            document.getElementById('read-modal').classList.remove('hidden');
+        }
+
+        function closeReadModal() { document.getElementById('read-modal').classList.add('hidden'); }
+
+        function openSettingsModal() { document.getElementById('settings-modal').classList.remove('hidden'); }
+        function closeSettingsModal() { document.getElementById('settings-modal').classList.add('hidden'); }
+
+        function openPaymentModal() { document.getElementById('payment-modal').classList.remove('hidden'); }
+        function closePaymentModal() { document.getElementById('payment-modal').classList.add('hidden'); }
+
+        function handlePaymentSubmit(e) {
+            e.preventDefault();
+            isProMember = true;
+            document.getElementById('nav-membership-tier').innerText = "Pro Member";
+            alert("Payment of ₱199.00 processed successfully via credit card! Pro Access is now unlocked for all files.");
+            closePaymentModal();
+            refreshUI();
+        }
+    </script>
+</body>
+</html>
