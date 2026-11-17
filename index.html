@@ -3,16 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EduRead - Cloud-Synced QR Lecture Hub</title>
+    <title>EduRead - Cloud Lecture Hub with Folders</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- QRCode.js CDN for dynamic QR generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <!-- FontAwesome for Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-<meta name="description" content="EduRead connects students and faculty through a shared lecture library, study notes, and QR access.">
-<meta property="og:site_name" content="EduRead"><meta property="og:title" content="EduRead — Lecture & Reading Hub"><meta property="og:description" content="Read lecture notes, publish course materials, and share your classroom library with a QR code.">  <script type="module" crossorigin src="/assets/index-VVWfWHep.js"></script>
-  <link rel="stylesheet" crossorigin href="/assets/index-CSFo_JZD.css">
 </head>
 <body class="bg-slate-900 text-slate-100 font-sans min-h-screen flex flex-col">
 
@@ -20,11 +17,11 @@
     <header class="bg-slate-800 border-b border-slate-700 px-6 py-4 flex justify-between items-center shadow-md">
         <div class="flex items-center space-x-3">
             <div class="bg-cyan-600 text-white p-2.5 rounded-xl shadow-lg">
-                <i class="fa-solid fa-cloud-arrow-up text-xl"></i>
+                <i class="fa-solid fa-folder-tree text-xl"></i>
             </div>
             <div>
                 <h1 class="text-xl font-bold tracking-wide">EduRead Cloud Portal</h1>
-                <p class="text-xs text-slate-400">Live Secure QR Lecture & Reading Hub</p>
+                <p class="text-xs text-slate-400">Secure Lecture Hub with Custom Folders</p>
             </div>
         </div>
         <div id="user-status" class="hidden flex items-center space-x-4">
@@ -45,131 +42,121 @@
         <!-- ==================== VIEW 1: LOGIN GATE ==================== -->
         <section id="login-view" class="max-w-md mx-auto bg-slate-800 border border-slate-700 rounded-2xl shadow-xl overflow-hidden mt-10">
             <div class="bg-cyan-600 px-6 py-6 text-center">
-                <h2 class="text-2xl font-extrabold text-white">Cloud Portal Gate</h2>
-                <p class="text-cyan-100 text-sm mt-1">Scan verified lecture QR or log in to read materials</p>
+                <h2 class="text-2xl font-extrabold text-white">Portal Access Gate</h2>
+                <p class="text-cyan-100 text-sm mt-1">Scan lecture QR or log in to access folders</p>
             </div>
             <div class="p-8 space-y-6">
-                <div class="bg-slate-900/60 p-3 rounded-lg border border-slate-700 text-xs text-slate-400 flex items-center space-x-2">
-                    <i class="fa-solid fa-shield-halved text-cyan-400 text-base"></i>
-                    <span>Cloud-synced protected access for live global classroom streaming.</span>
-                </div>
-                
                 <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email address</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                                <i class="fa-solid fa-user"></i>
-                            </span>
-                            <input type="email" id="login-id" required placeholder="e.g. student@school.edu" 
-                                class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-                        </div>
+                        <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Email or ID</label>
+                        <input type="text" id="login-id" required placeholder="e.g. student@school.edu" 
+                            class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                     </div>
                     <div>
                         <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Password</label>
-                        <div class="relative">
-                            <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-                                <i class="fa-solid fa-lock"></i>
-                            </span>
-                            <input type="password" id="login-password" required placeholder="••••••••" 
-                                class="w-full pl-10 pr-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
-                        </div>
+                        <input type="password" id="login-password" required placeholder="••••••••" 
+                            class="w-full px-4 py-3 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:border-cyan-500">
                     </div>
-                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 rounded-xl transition shadow-lg shadow-cyan-600/30 flex items-center justify-center space-x-2">
-                        <i class="fa-solid fa-right-to-bracket"></i>
-                        <span>Secure Cloud Login</span>
+                    <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-semibold py-3 rounded-xl transition shadow-lg">
+                        Secure Login
                     </button>
                 </form>
 
-                <div class="border-t border-slate-700 pt-4 text-sm space-y-3">
-                    <p id="auth-message" role="status" class="text-cyan-200" aria-live="polite"></p>
-                    <button type="button" onclick="createAccount()" class="text-cyan-300 underline">Create a student account</button>
-                    <button type="button" onclick="forgotPassword()" class="block text-slate-400 underline">Forgot password</button>
-                    <p class="text-xs text-slate-400">Faculty access is assigned by your portal administrator.</p>
-                </div>
-                <div class="border-t border-slate-700 pt-5 space-y-3" aria-labelledby="demo-heading">
-                    <h3 id="demo-heading" class="text-sm font-semibold text-slate-200">Demo accounts</h3>
-                    <p class="text-xs text-slate-400">Explore sample materials. No password needed.</p>
-                    <div class="grid grid-cols-2 gap-3">
-                        <button type="button" onclick="startDemo('student')" class="demo-entry border border-cyan-800 bg-cyan-950/40 hover:bg-cyan-900/50 text-cyan-200 rounded-xl px-3 py-3 text-sm font-semibold transition" disabled><i class="fa-solid fa-user-graduate mr-2" aria-hidden="true"></i>Student demo</button>
-                        <button type="button" onclick="startDemo('professor')" class="demo-entry border border-emerald-800 bg-emerald-950/40 hover:bg-emerald-900/50 text-emerald-200 rounded-xl px-3 py-3 text-sm font-semibold transition" disabled><i class="fa-solid fa-chalkboard-user mr-2" aria-hidden="true"></i>Professor demo</button>
+                <div class="border-t border-slate-700 pt-4">
+                    <p class="text-xs text-slate-400 text-center mb-2">Quick Demo Accounts:</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button type="button" onclick="fillDemo('student')" class="bg-slate-700 hover:bg-slate-600 text-xs py-2 px-3 rounded-lg text-cyan-300 font-medium">Student Demo</button>
+                        <button type="button" onclick="fillDemo('prof')" class="bg-slate-700 hover:bg-slate-600 text-xs py-2 px-3 rounded-lg text-emerald-300 font-medium">Professor Demo</button>
                     </div>
                 </div>
             </div>
         </section>
 
-        <div id="demo-notice" class="hidden mb-6 border border-amber-700/50 bg-amber-950/30 rounded-xl p-4 text-sm text-amber-200" role="status">Shared demo library · The professor demo can publish notes here. Switch to the student demo and refresh to read them. Demo posts are public; use sample content. Log out to return to sign-in.</div>
-
-        <!-- ==================== VIEW 2: STUDENT READING HUB ==================== -->
+        <!-- ==================== VIEW 2: STUDENT HUB ==================== -->
         <section id="student-dashboard" class="hidden space-y-6">
             <div class="bg-gradient-to-r from-cyan-950/80 to-slate-800 border border-cyan-700/50 p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-cyan-500/30">Live Cloud Library Active</span>
-                    <h2 class="text-2xl font-bold mt-2 text-white">Student Reading & Presentation Library</h2>
-                    <p class="text-slate-300 text-sm">Access, read, and study live presentations and notes synced directly from professors.</p>
+                    <span class="bg-cyan-500/20 text-cyan-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-cyan-500/30">Student Folder Library</span>
+                    <h2 class="text-2xl font-bold mt-2 text-white">Organized Lecture Folders</h2>
+                    <p class="text-slate-300 text-sm">Select a folder below to browse reading materials and presentation slides.</p>
                 </div>
-                <div class="bg-slate-900/80 px-4 py-3 rounded-xl border border-slate-700 text-right flex items-center space-x-3">
-                    <button onclick="loadReadings()" class="bg-slate-700 hover:bg-slate-600 text-white px-3 py-1.5 rounded-lg text-xs transition flex items-center space-x-1.5" title="Sync Latest Posts">
-                        <i class="fa-solid fa-rotate"></i>
-                        <span>Refresh</span>
-                    </button>
-                    <div>
-                        <p class="text-xs text-slate-400">Sync Status</p>
-                        <p class="text-sm font-mono text-emerald-400"><i class="fa-solid fa-circle-check text-xs"></i> <span id="sync-status">READY</span></p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Reading Material Grid -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="student-readings-container">
-                <!-- Dynamically populated via JS -->
-            </div>
-        </section>
-
-        <!-- ==================== VIEW 3: PROFESSOR PUBLISHER DASHBOARD ==================== -->
-        <section id="professor-dashboard" class="hidden space-y-6">
-            <div class="bg-gradient-to-r from-emerald-950/80 to-slate-800 border border-emerald-700/50 p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <span class="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-emerald-500/30">Faculty Cloud Manager</span>
-                    <h2 class="text-2xl font-bold mt-2 text-white">Professor Reading Material Manager</h2>
-                    <p class="text-slate-300 text-sm">Publish, manage, and delete live lecture presentations instantly visible via QR code.</p>
-                </div>
-                <button id="create-reading-button" onclick="openCreateModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl text-sm font-semibold transition shadow-lg flex items-center space-x-2">
-                    <i class="fa-solid fa-plus"></i>
-                    <span>Publish Reading Material</span>
+                <button onclick="openFolderModal()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2">
+                    <i class="fa-solid fa-folder-plus"></i>
+                    <span>+ Create New Folder</span>
                 </button>
             </div>
 
+            <!-- Folders Bar -->
+            <div class="flex items-center space-x-3 overflow-x-auto pb-2" id="student-folders-bar">
+                <!-- Dynamically populated via JS -->
+            </div>
+
+            <!-- Active Folder Materials Grid -->
+            <div>
+                <h3 id="student-current-folder-title" class="text-lg font-bold text-white mb-4"><i class="fa-solid fa-folder-open text-cyan-400 mr-2"></i> All Materials</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="student-readings-container"></div>
+            </div>
+        </section>
+
+        <!-- ==================== VIEW 3: PROFESSOR HUB ==================== -->
+        <section id="professor-dashboard" class="hidden space-y-6">
+            <div class="bg-gradient-to-r from-emerald-950/80 to-slate-800 border border-emerald-700/50 p-6 rounded-2xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div>
+                    <span class="bg-emerald-500/20 text-emerald-300 text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wider border border-emerald-500/30">Faculty Folder & Post Manager</span>
+                    <h2 class="text-2xl font-bold mt-2 text-white">Professor Material Manager</h2>
+                    <p class="text-slate-300 text-sm">Create folders, publish presentations, and manage your course library.</p>
+                </div>
+                <div class="flex items-center space-x-3">
+                    <button onclick="openFolderModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2">
+                        <i class="fa-solid fa-folder-plus"></i>
+                        <span>New Folder</span>
+                    </button>
+                    <button onclick="openCreateModal()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Publish Material</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Folders Bar -->
+            <div class="flex items-center space-x-3 overflow-x-auto pb-2" id="prof-folders-bar">
+                <!-- Dynamically populated via JS -->
+            </div>
+
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Readings List -->
                 <div class="lg:col-span-2 space-y-4">
-                    <div class="flex justify-between items-center">
-                        <h3 class="text-lg font-semibold text-slate-200"><i class="fa-solid fa-book text-emerald-400 mr-2"></i> Published Readings & Presentations</h3>
-                        <button onclick="loadReadings()" class="text-xs text-slate-400 hover:text-white"><i class="fa-solid fa-rotate mr-1"></i> Sync Cloud</button>
-                    </div>
-                    <div id="prof-readings-list" class="space-y-4">
-                        <!-- Dynamically populated via JS -->
-                    </div>
+                    <h3 id="prof-current-folder-title" class="text-lg font-semibold text-slate-200"><i class="fa-solid fa-folder-open text-emerald-400 mr-2"></i> All Materials</h3>
+                    <div id="prof-readings-list" class="space-y-4"></div>
                 </div>
 
                 <!-- QR Generator Box -->
                 <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-lg flex flex-col items-center text-center">
                     <h3 class="text-lg font-semibold text-slate-200 mb-1">Live Global QR Code</h3>
-                    <p class="text-xs text-slate-400 mb-4">Anyone scanning this QR code anywhere accesses this live portal.</p>
-                    <div id="qrcode-container" class="bg-white p-4 rounded-xl shadow-inner mb-4 flex items-center justify-center">
-                        <!-- Generated QR Code goes here -->
-                    </div>
+                    <p class="text-xs text-slate-400 mb-4">Scan to access this folder portal from anywhere.</p>
+                    <div id="qrcode-container" class="bg-white p-4 rounded-xl shadow-inner mb-4"></div>
                     <p id="qr-url-display" class="text-xs text-cyan-300 break-all font-mono mb-4 px-2"></p>
-                    <button onclick="generateNewQR()" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 px-4 rounded-xl text-xs font-semibold transition">
-                        Refresh QR Link
-                    </button>
                 </div>
             </div>
         </section>
 
     </main>
 
-    <!-- Modal: Publish Reading Material (Professor) -->
+    <!-- Modal: Create Folder -->
+    <div id="folder-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-sm p-6 space-y-4">
+            <h3 class="font-bold text-lg text-white"><i class="fa-solid fa-folder-plus text-cyan-400 mr-2"></i> Create Folder</h3>
+            <form onsubmit="handleCreateFolder(event)" class="space-y-3">
+                <input type="text" id="new-folder-name" required placeholder="Folder Name (e.g. Prelim Review)" 
+                    class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-cyan-500">
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeFolderModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl text-xs">Cancel</button>
+                    <button type="submit" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2 rounded-xl text-xs font-semibold">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal: Publish Reading Material -->
     <div id="create-modal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4">
         <div class="bg-slate-800 border border-slate-700 rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden">
             <div class="bg-slate-700/50 px-6 py-4 flex justify-between items-center border-b border-slate-700">
@@ -178,34 +165,34 @@
             </div>
             <form id="create-reading-form" onsubmit="handleCreateReading(event)" class="p-6 space-y-4">
                 <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Select Folder</label>
+                    <select id="new-material-folder" class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
+                        <!-- Populated dynamically -->
+                    </select>
+                </div>
+                <div>
                     <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Subject / Course</label>
                     <input type="text" id="new-subject" required placeholder="e.g. Information Technology 302" 
-                        class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500">
+                        class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Material / Presentation Title</label>
-                    <input type="text" id="new-title" required placeholder="e.g. Lecture 4: Database Normalization Slides" 
-                        class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500">
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Presentation Title</label>
+                    <input type="text" id="new-title" required placeholder="e.g. Chapter 4 Slides" 
+                        class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Reading Content / Study Summary</label>
-                    <textarea id="new-content" rows="4" required placeholder="Provide the lecture summary or reading points for students to study..." 
-                        class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500"></textarea>
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Summary & Notes</label>
+                    <textarea id="new-content" rows="3" required placeholder="Key points to review..." 
+                        class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500"></textarea>
                 </div>
                 <div>
-                    <label id="filename-label" class="block text-xs font-semibold uppercase text-slate-400 mb-1">Notes file name (.txt)</label>
-                    <input type="text" id="new-filename" required placeholder="e.g. IT302_Lecture4.txt" 
-                        class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white placeholder-slate-500 text-sm focus:outline-none focus:border-emerald-500">
+                    <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">File Name</label>
+                    <input type="text" id="new-filename" required placeholder="e.g. Lecture4.pptx" 
+                        class="w-full px-4 py-2.5 bg-slate-900 border border-slate-700 rounded-xl text-white text-sm focus:outline-none focus:border-emerald-500">
                 </div>
-                <div id="demo-file-field" class="hidden space-y-2">
-                    <label for="new-file" class="block text-xs font-semibold uppercase text-slate-400">Attach a file (optional)</label>
-                    <input type="file" id="new-file" aria-describedby="file-help" class="w-full text-sm text-slate-300 border border-slate-700 rounded-xl p-3 bg-slate-900">
-                    <p id="file-help" class="text-xs text-slate-400">Any file type · up to 3 MB. Published demo files are public. Without a file, the notes download as text.</p>
-                </div>
-                <p id="publish-error" role="alert" class="text-sm text-rose-300"></p>
-                <div id="publish-actions" class="flex justify-end space-x-3 pt-2">
-                    <button type="button" onclick="closeCreateModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl text-sm font-medium transition">Cancel</button>
-                    <button type="submit" id="publish-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-sm font-semibold transition shadow-lg">Publish Live</button>
+                <div class="flex justify-end space-x-3 pt-2">
+                    <button type="button" onclick="closeCreateModal()" class="bg-slate-700 hover:bg-slate-600 text-white px-4 py-2 rounded-xl text-xs">Cancel</button>
+                    <button type="submit" id="publish-btn" class="bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2 rounded-xl text-xs font-semibold">Publish Live</button>
                 </div>
             </form>
         </div>
@@ -222,37 +209,281 @@
                 <button onclick="closeReadModal()" class="text-white hover:text-cyan-200 text-lg"><i class="fa-solid fa-xmark"></i></button>
             </div>
             <div class="p-6 space-y-6 overflow-y-auto flex-grow">
-                <!-- Reading Content Box -->
                 <div class="bg-slate-900/60 border border-slate-700 rounded-xl p-5 space-y-3">
-                    <h5 class="text-xs uppercase font-bold text-cyan-400 tracking-wider"><i class="fa-solid fa-align-left mr-1"></i> Lecture Summary & Notes</h5>
+                    <h5 class="text-xs uppercase font-bold text-cyan-400 tracking-wider">Lecture Summary & Notes</h5>
                     <p id="read-modal-content" class="text-slate-200 text-sm leading-relaxed whitespace-pre-line"></p>
                 </div>
-
-                <section id="file-preview-section" class="hidden space-y-3" aria-labelledby="file-preview-heading">
-                    <h4 id="file-preview-heading" class="text-sm font-semibold text-cyan-300">File preview</h4>
-                    <p id="file-preview-status" class="text-sm text-slate-400" role="status"></p>
-                    <div id="file-preview-content"></div>
-                </section>
-
-                <!-- Attached File Card -->
-                <div id="download-card" class="bg-slate-900 border border-slate-700 rounded-xl p-5 flex items-center justify-between">
+                <div class="bg-slate-900 border border-slate-700 rounded-xl p-5 flex items-center justify-between">
                     <div class="flex items-center space-x-3">
                         <div class="bg-cyan-500/20 text-cyan-400 p-3 rounded-xl border border-cyan-500/30">
                             <i class="fa-solid fa-file-powerpoint text-2xl"></i>
                         </div>
                         <div>
                             <h4 id="read-filename" class="font-bold text-white text-sm">Presentation.pptx</h4>
-                            <p id="download-description" class="text-xs text-slate-400">Downloadable lecture notes</p>
+                            <p class="text-xs text-slate-400">Cloud Synced File</p>
                         </div>
                     </div>
-                    <button onclick="simulateDownload()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold transition flex items-center space-x-2 shadow">
-                        <i class="fa-solid fa-download"></i>
-                        <span id="download-label">Download Notes</span>
+                    <button onclick="alert('Downloading file...')" class="bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow">
+                        <i class="fa-solid fa-download mr-1"></i> Download File
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- JavaScript Application Logic with Cloud JSONbin Sync -->
+    <script>
+        const BIN_ID = "6771804ead19ca34f8f41423"; 
+        const API_KEY = "$2a$10$t6k30wY2S0t5d5zH5Pj97eqg5Zt1uXp4q3a15Z2b3c4d5e6f7g8h9";
+        const API_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
-<footer class="text-center text-xs text-slate-500 py-6">EduRead · Your classroom, connected.</footer></body></html>
+        let currentUser = null;
+        let folders = ["All Materials", "General Lectures", "Midterm Review"];
+        let readings = [
+            {
+                id: 1,
+                folder: "General Lectures",
+                subject: "Information Technology",
+                title: "Chapter 1: Network Architecture",
+                content: "Overview of OSI 7-Layer Model and subnet calculations.",
+                fileName: "IT302_Ch1.pptx",
+                date: "2026-03-10"
+            }
+        ];
+        let currentFolderFilter = "All Materials";
+
+        window.onload = function() {
+            const currentUrl = window.location.href.split('#')[0];
+            renderQRCode(currentUrl);
+            document.getElementById('qr-url-display').innerText = currentUrl;
+            loadCloudData();
+        };
+
+        function renderQRCode(text) {
+            const container = document.getElementById("qrcode-container");
+            container.innerHTML = "";
+            new QRCode(container, {
+                text: text,
+                width: 130,
+                height: 130,
+                colorDark: "#0f172a",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+
+        function fillDemo(type) {
+            if (type === 'student') {
+                document.getElementById('login-id').value = "student@school.edu";
+                document.getElementById('login-password').value = "student123";
+            } else {
+                document.getElementById('login-id').value = "prof@school.edu";
+                document.getElementById('login-password').value = "prof123";
+            }
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const idInput = document.getElementById('login-id').value.trim();
+            const passInput = document.getElementById('login-password').value;
+
+            const accounts = {
+                "student@school.edu": { name: "Limwel Barola", role: "student", pass: "student123" },
+                "prof@school.edu": { name: "Dr. Alvero", role: "professor", pass: "prof123" }
+            };
+
+            if (accounts[idInput] && accounts[idInput].pass === passInput) {
+                currentUser = { email: idInput, ...accounts[idInput] };
+                updateUIAfterLogin();
+            } else {
+                alert("Invalid login credentials! Use demo buttons.");
+            }
+        }
+
+        function updateUIAfterLogin() {
+            document.getElementById('login-view').classList.add('hidden');
+            document.getElementById('user-status').classList.remove('hidden');
+            document.getElementById('nav-username').innerText = currentUser.name;
+            document.getElementById('nav-role').innerText = currentUser.role;
+
+            loadCloudData();
+            if (currentUser.role === 'student') {
+                document.getElementById('student-dashboard').classList.remove('hidden');
+            } else {
+                document.getElementById('professor-dashboard').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            document.getElementById('user-status').classList.add('hidden');
+            document.getElementById('student-dashboard').classList.add('hidden');
+            document.getElementById('professor-dashboard').classList.add('hidden');
+            document.getElementById('login-view').classList.remove('hidden');
+            document.getElementById('login-form').reset();
+        }
+
+        function loadCloudData() {
+            fetch(API_URL + "/latest", { headers: { "X-Master-Key": API_KEY } })
+            .then(res => res.json())
+            .then(data => {
+                if (data.record) {
+                    readings = data.record.readings || readings;
+                    folders = data.record.folders || folders;
+                }
+                refreshUI();
+            }).catch(err => console.log("Cloud sync fallback:", err));
+        }
+
+        function saveCloudData() {
+            return fetch(API_URL, {
+                method: 'PUT',
+                headers: { "Content-Type": "application/json", "X-Master-Key": API_KEY },
+                body: JSON.stringify({ readings: readings, folders: folders })
+            });
+        }
+
+        function refreshUI() {
+            renderFoldersBar();
+            if (currentUser) {
+                if (currentUser.role === 'student') renderStudentReadings();
+                else renderProfessorReadings();
+            }
+        }
+
+        // Folder Rendering & Navigation
+        function renderFoldersBar() {
+            const bars = ['student-folders-bar', 'prof-folders-bar'];
+            bars.forEach(barId => {
+                const bar = document.getElementById(barId);
+                if (!bar) return;
+                bar.innerHTML = "";
+
+                folders.forEach(folder => {
+                    const isActive = currentFolderFilter === folder;
+                    const btn = document.createElement('button');
+                    btn.className = `px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center space-x-2 whitespace-nowrap ${
+                        isActive ? 'bg-cyan-600 text-white shadow-lg' : 'bg-slate-800 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                    }`;
+                    btn.innerHTML = `<i class="fa-solid fa-folder${isActive ? '-open' : ''}"></i><span>${folder}</span>`;
+                    btn.onclick = () => {
+                        currentFolderFilter = folder;
+                        refreshUI();
+                    };
+                    bar.appendChild(btn);
+                });
+            });
+
+            // Update modal folder select options
+            const select = document.getElementById('new-material-folder');
+            if (select) {
+                select.innerHTML = folders.filter(f => f !== "All Materials").map(f => `<option value="${f}">${f}</option>`).join('');
+            }
+        }
+
+        function openFolderModal() { document.getElementById('folder-modal').classList.remove('hidden'); }
+        function closeFolderModal() { document.getElementById('folder-modal').classList.add('hidden'); document.getElementById('new-folder-name').value = ""; }
+
+        function handleCreateFolder(e) {
+            e.preventDefault();
+            const name = document.getElementById('new-folder-name').value.trim();
+            if (name && !folders.includes(name)) {
+                folders.push(name);
+                saveCloudData().then(() => {
+                    closeFolderModal();
+                    refreshUI();
+                    alert(`Folder "${name}" created successfully!`);
+                });
+            } else {
+                alert("Folder already exists or invalid name.");
+            }
+        }
+
+        // Student View
+        function renderStudentReadings() {
+            document.getElementById('student-current-folder-title').innerHTML = `<i class="fa-solid fa-folder-open text-cyan-400 mr-2"></i> Folder: ${currentFolderFilter}`;
+            const container = document.getElementById('student-readings-container');
+            container.innerHTML = "";
+
+            const filtered = currentFolderFilter === "All Materials" ? readings : readings.filter(r => r.folder === currentFolderFilter);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 text-sm col-span-2 text-center py-8">No materials found in this folder.</p>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-lg flex flex-col justify-between";
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-cyan-500/20 text-cyan-300 text-xs px-2.5 py-1 rounded-md font-semibold">${item.subject}</span>
+                            <span class="text-xs text-slate-400"><i class="fa-solid fa-folder text-cyan-400 mr-1"></i> ${item.folder}</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-white mb-2">${item.title}</h3>
+                        <p class="text-slate-300 text-sm mb-4 leading-relaxed line-clamp-2">${item.content}</p>
+                    </div>
+                    <div class="border-t border-slate-700 pt-4 mt-2 flex items-center justify-between">
+                        <span class="text-xs text-slate-400"><i class="fa-solid fa-file-powerpoint text-cyan-400 mr-1"></i> ${item.fileName}</span>
+                        <button onclick="openReadModal(${item.id})" class="bg-cyan-600 hover:bg-cyan-700 text-white py-2 px-4 rounded-xl text-xs transition shadow flex items-center space-x-2">
+                            <i class="fa-solid fa-book-open"></i><span>Read</span>
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Professor View
+        function renderProfessorReadings() {
+            document.getElementById('prof-current-folder-title').innerHTML = `<i class="fa-solid fa-folder-open text-emerald-400 mr-2"></i> Folder: ${currentFolderFilter}`;
+            const container = document.getElementById('prof-readings-list');
+            container.innerHTML = "";
+
+            const filtered = currentFolderFilter === "All Materials" ? readings : readings.filter(r => r.folder === currentFolderFilter);
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-slate-400 text-sm text-center py-8">No materials found in this folder.</p>`;
+                return;
+            }
+
+            filtered.forEach(item => {
+                const card = document.createElement('div');
+                card.className = "bg-slate-800 border border-slate-700 rounded-2xl p-6 shadow-lg space-y-3";
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <span class="bg-emerald-500/20 text-emerald-300 text-xs px-2.5 py-1 rounded-md font-semibold">${item.subject}</span>
+                            <h4 class="text-lg font-bold text-white mt-1">${item.title}</h4>
+                        </div>
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xs bg-slate-700 px-2.5 py-1 rounded text-slate-300"><i class="fa-solid fa-folder text-emerald-400 mr-1"></i> ${item.folder}</span>
+                            <button onclick="deleteReading(${item.id})" class="bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 p-2 rounded-lg text-xs transition" title="Delete">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <p class="text-slate-300 text-sm whitespace-pre-line line-clamp-2">${item.content}</p>
+                    <div class="text-xs text-slate-400 pt-2 border-t border-slate-700/60">File: ${item.fileName}</div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function openCreateModal() { document.getElementById('create-modal').classList.remove('hidden'); }
+        function closeCreateModal() { document.getElementById('create-modal').classList.add('hidden'); document.getElementById('create-reading-form').reset(); }
+
+        function handleCreateReading(e) {
+            e.preventDefault();
+            const newRead = {
+                id: Date.now(),
+                folder: document.getElementById('new-material-folder').value,
+                subject: document.getElementById('new-subject').value,
+                title: document.getElementById('new-title').value,
+                content: document.getElementById('new-content').value,
+                fileName: document.getElementById('new-filename').value,
+                date: new Date().toISOString().split('T')[0]
+            };
+
+            readings.unshift(
